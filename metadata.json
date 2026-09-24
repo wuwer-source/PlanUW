@@ -1,0 +1,8 @@
+{
+  "name": "Remix Planer Urlopów i Kalendarz Świąt",
+  "description": "Nowoczesny, responsywny planer urlopów wypoczynkowych z automatycznym wyliczaniem polskich świąt ruchomych i stałych, ewidencją dni zaległych i bieżących oraz eksportem do Excela.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+  </defs>
+  <!-- Background with safe zone rounded rect -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- Inner Calendar Body -->
+  <g transform="translate(56, 56)">
+    <rect width="400" height="400" rx="48" fill="url(#card)" filter="drop-shadow(0 16px 32px rgba(0,0,0,0.15))"/>
+    <!-- Calendar Top Bar -->
+    <path d="M0 48 C0 21.487 21.487 0 48 0 L352 0 C378.513 0 400 21.487 400 48 L400 110 L0 110 Z" fill="#1e293b"/>
+    <!-- Binder Rings -->
+    <rect x="90" y="-18" width="24" height="44" rx="12" fill="#f59e0b" stroke="#ffffff" stroke-width="4"/>
+    <rect x="286" y="-18" width="24" height="44" rx="12" fill="#f59e0b" stroke="#ffffff" stroke-width="4"/>
+    <!-- Grid Squares: vacation style -->
+    <!-- Row 1 -->
+    <rect x="50" y="150" width="60" height="50" rx="12" fill="#e2e8f0"/>
+    <rect x="130" y="150" width="60" height="50" rx="12" fill="#fef08a" stroke="#eab308" stroke-width="3"/>
+    <rect x="210" y="150" width="60" height="50" rx="12" fill="#bae6fd" stroke="#0284c7" stroke-width="3"/>
+    <rect x="290" y="150" width="60" height="50" rx="12" fill="#fee2e2" stroke="#ef4444" stroke-width="3"/>
+    <!-- Row 2 -->
+    <rect x="50" y="225" width="60" height="50" rx="12" fill="#bae6fd" stroke="#0284c7" stroke-width="3"/>
+    <rect x="130" y="225" width="60" height="50" rx="12" fill="#bae6fd" stroke="#0284c7" stroke-width="3"/>
+    <rect x="210" y="225" width="60" height="50" rx="12" fill="#fef08a" stroke="#eab308" stroke-width="3"/>
+    <rect x="290" y="225" width="60" height="50" rx="12" fill="#fee2e2" stroke="#ef4444" stroke-width="3"/>
+    <!-- Row 3 -->
+    <rect x="50" y="300" width="60" height="50" rx="12" fill="#e2e8f0"/>
+    <rect x="130" y="300" width="60" height="50" rx="12" fill="#e2e8f0"/>
+    <rect x="210" y="300" width="60" height="50" rx="12" fill="#fef08a" stroke="#eab308" stroke-width="3"/>
+    <rect x="290" y="300" width="60" height="50" rx="12" fill="#fee2e2" stroke="#ef4444" stroke-width="3"/>
+    <!-- Sun Accent -->
+    <circle cx="200" cy="55" r="16" fill="#fbbf24"/>
+  </g>
+</svg>
