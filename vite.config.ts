@@ -3,9 +3,11 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig} from 'vite';
 
-export default defineConfig(() => {
+export default defineConfig(({command}) => {
   return {
-    base: '/PlanUW/', // <--- TEGO BRAKOWAŁO (zawsze z ukośnikami z przodu i z tyłu)
+    // Podczas budowania na GitHub Pages (npm run build) używamy '/PlanUW/',
+    // a w lokalnym podglądzie (npm run dev) używamy '/', dzięki czemu podgląd tutaj nie jest białą stroną!
+    base: command === 'build' ? '/PlanUW/' : '/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
