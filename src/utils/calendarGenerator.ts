@@ -102,10 +102,13 @@ export function computeLeaveStats(sheet: CalendarSheet): LeaveStats {
     }
   });
 
-  const remainingZalegly = sheet.quotaZalegly - usedZalegly;
-  const remainingBiezacy = sheet.quotaBiezacy - usedBiezacy;
+  const currentQuotaZalegly = sheet.yearlyQuotas?.[sheet.year]?.quotaZalegly ?? sheet.quotaZalegly ?? 0;
+  const currentQuotaBiezacy = sheet.yearlyQuotas?.[sheet.year]?.quotaBiezacy ?? sheet.quotaBiezacy ?? 26;
+
+  const remainingZalegly = currentQuotaZalegly - usedZalegly;
+  const remainingBiezacy = currentQuotaBiezacy - usedBiezacy;
   const totalUsed = usedZalegly + usedBiezacy;
-  const totalQuota = sheet.quotaZalegly + sheet.quotaBiezacy;
+  const totalQuota = currentQuotaZalegly + currentQuotaBiezacy;
   const totalRemaining = remainingZalegly + remainingBiezacy;
 
   // Count workdays in year
@@ -223,14 +226,17 @@ export function exportCalendarToExcel(sheets: CalendarSheet[], targetSheetId?: s
     wsData[1][5] = '[BIEŻĄCY]';
     wsData[1][6] = 'bieżący';
 
+    const qZalegly = sheet.yearlyQuotas?.[year]?.quotaZalegly ?? sheet.quotaZalegly ?? 0;
+    const qBiezacy = sheet.yearlyQuotas?.[year]?.quotaBiezacy ?? sheet.quotaBiezacy ?? 26;
+
     // K2:N2 -> "UW " & (rok - 1) & " -" | 0 | "DNI" (Cols 10, 11, 12, 13)
     wsData[1][10] = `UW ${year - 1} -`;
-    wsData[1][12] = sheet.quotaZalegly;
+    wsData[1][12] = qZalegly;
     wsData[1][13] = 'DNI';
 
     // T2:W2 -> "UW " & rok & " -" | 26 | "DNI" (Cols 19, 20, 21, 22)
     wsData[1][19] = `UW ${year} -`;
-    wsData[1][21] = sheet.quotaBiezacy;
+    wsData[1][21] = qBiezacy;
     wsData[1][22] = 'DNI';
 
     // 12 months blocks

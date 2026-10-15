@@ -25,6 +25,9 @@ export function generateStyledExcelHtml(sheets: CalendarSheet[], targetSheetId?:
     .map(([date]) => date)
     .sort();
 
+  const quotaZalegly = activeSheet.yearlyQuotas?.[year]?.quotaZalegly ?? activeSheet.quotaZalegly ?? 0;
+  const quotaBiezacy = activeSheet.yearlyQuotas?.[year]?.quotaBiezacy ?? activeSheet.quotaBiezacy ?? 26;
+
   let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -83,11 +86,11 @@ export function generateStyledExcelHtml(sheets: CalendarSheet[], targetSheetId?:
   <!-- Stats cards row -->
   <tr>
     <td colspan="7" class="card-zalegly">
-      UW ${year - 1} (Zaległy): ${zalegle.length} / ${activeSheet.quotaZalegly} DNI
+      UW ${year - 1} (Zaległy): ${zalegle.length} / ${quotaZalegly} DNI
     </td>
     <td colspan="2"></td>
     <td colspan="7" class="card-biezacy">
-      UW ${year} (Bieżący): ${biezace.length} / ${activeSheet.quotaBiezacy} DNI
+      UW ${year} (Bieżący): ${biezace.length} / ${quotaBiezacy} DNI
     </td>
     <td colspan="2"></td>
     <td colspan="6" style="background-color:#f1f5f9; font-weight:bold; border: 1px solid #cbd5e1;">

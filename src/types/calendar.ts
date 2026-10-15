@@ -18,13 +18,19 @@ export interface DayStatus {
   leaveType?: LeaveType;
 }
 
+export interface YearQuota {
+  quotaZalegly: number; // UW (rok - 1)
+  quotaBiezacy: number; // UW rok
+}
+
 export interface CalendarSheet {
   id: string;
   name: string; // e.g. "Kalendarz_2026_1" or "Jan Kowalski"
   employeeName: string;
   year: number;
-  quotaZalegly: number; // UW (rok - 1) - default 0
-  quotaBiezacy: number; // UW rok - default 26
+  quotaZalegly: number; // UW (rok - 1) dla aktualnego roku
+  quotaBiezacy: number; // UW rok dla aktualnego roku
+  yearlyQuotas?: Record<number, YearQuota>; // indywidualne pule urlopowe dla każdego roku osobno
   selectedDays: Record<string, LeaveType>; // key: YYYY-MM-DD, val: 'zalegly' | 'biezacy'
   isLocked: boolean; // Protect sheet
   notes?: string;

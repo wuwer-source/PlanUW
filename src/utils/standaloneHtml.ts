@@ -20,6 +20,9 @@ export function generateStandaloneHtmlFile(sheets: CalendarSheet[]): string {
         year: s.year || 2026,
         quotaZalegly: s.quotaZalegly ?? 0,
         quotaBiezacy: s.quotaBiezacy ?? 26,
+        yearlyQuotas: s.yearlyQuotas || {
+          [s.year || 2026]: { quotaZalegly: s.quotaZalegly ?? 0, quotaBiezacy: s.quotaBiezacy ?? 26 },
+        },
         selectedDays: s.selectedDays || {},
         activeMode: 'zalegly',
       }))
@@ -1019,6 +1022,17 @@ export function generateStandaloneHtmlFile(sheets: CalendarSheet[]): string {
 
     function zaladujDaneArkusza() {
       var sheet = getActiveSheet();
+      if (!sheet.yearlyQuotas) {
+        sheet.yearlyQuotas = {};
+      }
+      var yQuotas = sheet.yearlyQuotas[sheet.year] || {
+        quotaZalegly: sheet.quotaZalegly != null ? sheet.quotaZalegly : 0,
+        quotaBiezacy: sheet.quotaBiezacy != null ? sheet.quotaBiezacy : 26
+      };
+      sheet.yearlyQuotas[sheet.year] = yQuotas;
+      sheet.quotaZalegly = yQuotas.quotaZalegly;
+      sheet.quotaBiezacy = yQuotas.quotaBiezacy;
+
       document.getElementById('employeeNameInput').value = sheet.employeeName || sheet.name || '';
       document.getElementById('yearInput').value = sheet.year;
       document.getElementById('quotaZalegly').value = sheet.quotaZalegly;
@@ -1540,7 +1554,20 @@ export function generateStandaloneHtmlFile(sheets: CalendarSheet[]): string {
     // Zmiana roku
     document.getElementById('yearInput').onchange = function(e) {
       var sheet = getActiveSheet();
-      sheet.year = parseInt(e.target.value) || 2026;
+      var newYear = parseInt(e.target.value) || 2026;
+      if (!sheet.yearlyQuotas) {
+        sheet.yearlyQuotas = {};
+      }
+      sheet.yearlyQuotas[sheet.year] = {
+        quotaZalegly: sheet.quotaZalegly != null ? sheet.quotaZalegly : 0,
+        quotaBiezacy: sheet.quotaBiezacy != null ? sheet.quotaBiezacy : 26
+      };
+      sheet.year = newYear;
+      var targetQuotas = sheet.yearlyQuotas[newYear] || { quotaZalegly: 0, quotaBiezacy: 26 };
+      sheet.yearlyQuotas[newYear] = targetQuotas;
+      sheet.quotaZalegly = targetQuotas.quotaZalegly;
+      sheet.quotaBiezacy = targetQuotas.quotaBiezacy;
+
       zapiszStan();
       renderTabs();
       zaladujDaneArkusza();
@@ -1550,13 +1577,27 @@ export function generateStandaloneHtmlFile(sheets: CalendarSheet[]): string {
     // Zmiana limitów
     document.getElementById('quotaZalegly').onchange = function(e) {
       var sheet = getActiveSheet();
-      sheet.quotaZalegly = parseInt(e.target.value) || 0;
+      var val = parseInt(e.target.value) || 0;
+      sheet.quotaZalegly = val;
+      if (!sheet.yearlyQuotas) sheet.yearlyQuotas = {};
+      if (!sheet.yearlyQuotas[sheet.year]) {
+        sheet.yearlyQuotas[sheet.year] = { quotaZalegly: val, quotaBiezacy: sheet.quotaBiezacy != null ? sheet.quotaBiezacy : 26 };
+      } else {
+        sheet.yearlyQuotas[sheet.year].quotaZalegly = val;
+      }
       zapiszStan();
       renderCalendar();
     };
     document.getElementById('quotaBiezacy').onchange = function(e) {
       var sheet = getActiveSheet();
-      sheet.quotaBiezacy = parseInt(e.target.value) || 0;
+      var val = parseInt(e.target.value) || 0;
+      sheet.quotaBiezacy = val;
+      if (!sheet.yearlyQuotas) sheet.yearlyQuotas = {};
+      if (!sheet.yearlyQuotas[sheet.year]) {
+        sheet.yearlyQuotas[sheet.year] = { quotaZalegly: sheet.quotaZalegly != null ? sheet.quotaZalegly : 0, quotaBiezacy: val };
+      } else {
+        sheet.yearlyQuotas[sheet.year].quotaBiezacy = val;
+      }
       zapiszStan();
       renderCalendar();
     };

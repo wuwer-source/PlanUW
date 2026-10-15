@@ -45,6 +45,9 @@ export default function App() {
         year: currentSystemYear,
         quotaZalegly: 0,
         quotaBiezacy: 26,
+        yearlyQuotas: {
+          [currentSystemYear]: { quotaZalegly: 0, quotaBiezacy: 26 },
+        },
         selectedDays: {},
         isLocked: false,
         createdAt: Date.now(),
@@ -154,11 +157,19 @@ export default function App() {
 
   // Quota update
   const handleUpdateQuota = (quotaZalegly: number, quotaBiezacy: number) => {
-    updateCurrentSheet((prev) => ({
-      ...prev,
-      quotaZalegly,
-      quotaBiezacy,
-    }));
+    updateCurrentSheet((prev) => {
+      const curYear = prev.year;
+      const nextYearlyQuotas = {
+        ...(prev.yearlyQuotas || {}),
+        [curYear]: { quotaZalegly, quotaBiezacy },
+      };
+      return {
+        ...prev,
+        quotaZalegly,
+        quotaBiezacy,
+        yearlyQuotas: nextYearlyQuotas,
+      };
+    });
   };
 
   // Lock toggle
@@ -196,6 +207,9 @@ export default function App() {
       year: activeSheet.year,
       quotaZalegly: 0,
       quotaBiezacy: 26,
+      yearlyQuotas: {
+        [activeSheet.year]: { quotaZalegly: 0, quotaBiezacy: 26 },
+      },
       selectedDays: {},
       isLocked: false,
       createdAt: Date.now(),
@@ -215,6 +229,9 @@ export default function App() {
       id: `sheet_${Date.now()}`,
       name: copyName,
       employeeName: copyName,
+      yearlyQuotas: target.yearlyQuotas
+        ? JSON.parse(JSON.stringify(target.yearlyQuotas))
+        : { [target.year]: { quotaZalegly: target.quotaZalegly, quotaBiezacy: target.quotaBiezacy } },
       createdAt: Date.now(),
     };
     setSheets((prev) => [...prev, newSheet]);
@@ -256,7 +273,34 @@ export default function App() {
   // Change Year
   const handleChangeYear = (id: string, newYear: number) => {
     setSheets((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, year: newYear } : s))
+      prev.map((s) => {
+        if (s.id !== id) return s;
+
+        // 1. Zapisz pule obecnego roku w yearlyQuotas przed zmianą roku
+        const currentYearQuotas = s.yearlyQuotas?.[s.year] || {
+          quotaZalegly: s.quotaZalegly ?? 0,
+          quotaBiezacy: s.quotaBiezacy ?? 26,
+        };
+        const updatedYearlyQuotas = {
+          ...(s.yearlyQuotas || {}),
+          [s.year]: currentYearQuotas,
+        };
+
+        // 2. Pobierz pule dla nowego roku (lub domyślne 0 i 26, jeśli jeszcze nie zdefiniowano dla tego roku)
+        const targetQuotas = updatedYearlyQuotas[newYear] || {
+          quotaZalegly: 0,
+          quotaBiezacy: 26,
+        };
+        updatedYearlyQuotas[newYear] = targetQuotas;
+
+        return {
+          ...s,
+          year: newYear,
+          quotaZalegly: targetQuotas.quotaZalegly,
+          quotaBiezacy: targetQuotas.quotaBiezacy,
+          yearlyQuotas: updatedYearlyQuotas,
+        };
+      })
     );
   };
 
@@ -315,6 +359,9 @@ export default function App() {
       year,
       quotaZalegly,
       quotaBiezacy,
+      yearlyQuotas: {
+        [year]: { quotaZalegly, quotaBiezacy },
+      },
       selectedDays: {},
       isLocked: false,
       createdAt: Date.now() + idx,
