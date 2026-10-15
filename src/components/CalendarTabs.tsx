@@ -52,7 +52,7 @@ export const CalendarTabs: React.FC<CalendarTabsProps> = ({
   return (
     <>
       <div className="bg-slate-100/90 border-b border-slate-200 px-4 sm:px-6 lg:px-8 pt-3 no-print">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-[1680px] mx-auto">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-2">
             {/* Tabs row */}
             <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-thin py-1">

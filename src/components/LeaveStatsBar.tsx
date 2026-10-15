@@ -28,7 +28,7 @@ export const LeaveStatsBar: React.FC<LeaveStatsBarProps> = ({
 
   return (
     <div className="bg-white border-b border-slate-200 py-4 px-4 sm:px-6 lg:px-8 shadow-2xs">
-      <div className="max-w-7xl mx-auto space-y-4">
+      <div className="max-w-[1680px] mx-auto space-y-4">
         {/* Banner if locked */}
         {isLocked && (
           <div className="flex items-center gap-2 bg-amber-50/90 border border-amber-200 text-amber-900 px-3.5 py-2 rounded-lg text-xs font-medium no-print">
