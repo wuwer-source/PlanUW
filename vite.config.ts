@@ -4,8 +4,14 @@ import path from 'path';
 import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
+  // Na GitHub Pages repozytorium jest serwowane z podfolderu np. '/PlanUW/'.
+  // W środowisku GitHub Actions zmienna GITHUB_REPOSITORY to np. 'wuwer-source/PlanUW'.
+  // W AI Studio (dev/preview) używamy './' lub '/', dzięki czemu aplikacja działa w obu miejscach bez białego ekranu.
+  const repoName = process.env.GITHUB_REPOSITORY?.split('/')[1];
+  const base = process.env.GITHUB_ACTIONS && repoName ? `/${repoName}/` : './';
+
   return {
-    base: '/',
+    base,
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
