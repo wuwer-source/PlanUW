@@ -15,7 +15,7 @@ import { LeaveListDrawer } from './components/LeaveListDrawer';
 import { BatchGenerateModal } from './components/BatchGenerateModal';
 import { RangeSelectModal } from './components/RangeSelectModal';
 import { HolidayListModal } from './components/HolidayListModal';
-import { DownloadModal } from './components/DownloadModal';
+import { generateStandaloneHtmlFile } from './utils/standaloneHtml';
 import { CheckCircle2, AlertTriangle, Info, Printer } from 'lucide-react';
 
 const STORAGE_KEY = 'vba_calendar_sheets_v1';
@@ -60,7 +60,6 @@ export default function App() {
   const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
   const [isRangeModalOpen, setIsRangeModalOpen] = useState(false);
   const [isHolidayModalOpen, setIsHolidayModalOpen] = useState(false);
-  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
   // Save to localStorage
   useEffect(() => {
@@ -342,6 +341,77 @@ export default function App() {
     }
   };
 
+  // Zapisz kopię pliku JSON
+  const handleSaveJson = () => {
+    try {
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(sheets, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute('href', dataStr);
+      const today = new Date().toISOString().slice(0, 10);
+      downloadAnchor.setAttribute('download', `Plan_Urlopow_Backup_${activeSheet.year}_${today}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showNotification('Pobrano plik kopii zapasowej JSON ze wszystkimi arkuszami!', 'success');
+    } catch (err) {
+      console.error(err);
+      showNotification('Błąd podczas zapisywania pliku kopii JSON.', 'warning');
+    }
+  };
+
+  // Otwórz kopię pliku JSON
+  const handleOpenFile = (file: File) => {
+    const reader = new FileReader();
+    reader.readAsText(file, 'UTF-8');
+    reader.onload = (e) => {
+      try {
+        const parsed = JSON.parse(e.target?.result as string);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const isValid = parsed.every(
+            (item) => typeof item === 'object' && item !== null && 'id' in item && 'name' in item
+          );
+          if (isValid) {
+            setSheets(parsed);
+            if (parsed[0]?.id) {
+              setActiveSheetId(parsed[0].id);
+            }
+            showNotification(`Pomyślnie wczytano ${parsed.length} arkuszy z pliku "${file.name}"!`, 'success');
+          } else {
+            showNotification('Wybrany plik JSON nie zawiera poprawnej listy arkuszy urlopowych.', 'warning');
+          }
+        } else {
+          showNotification('Nieprawidłowy format pliku JSON (brak listy arkuszy).', 'warning');
+        }
+      } catch (err) {
+        console.error(err);
+        showNotification('Błąd odczytu pliku JSON. Upewnij się, że plik jest poprawny.', 'warning');
+      }
+    };
+    reader.onerror = () => {
+      showNotification('Wystąpił błąd podczas odczytu pliku z dysku.', 'warning');
+    };
+  };
+
+  // Eksport do pliku HTML (funkcja z pobierz na komputer)
+  const handleExportHtml = () => {
+    try {
+      const htmlContent = generateStandaloneHtmlFile(sheets);
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Planer_Urlopow_${activeSheet.year}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showNotification('Pobrano w 100% samodzielny plik HTML do uruchomienia offline!', 'success');
+    } catch (err) {
+      console.error(err);
+      showNotification('Błąd podczas generowania pliku HTML.', 'warning');
+    }
+  };
+
   // Print view
   const handlePrint = () => {
     window.print();
@@ -360,9 +430,11 @@ export default function App() {
         onUpdateEmployeeName={handleUpdateEmployeeName}
         onOpenBatchModal={() => setIsBatchModalOpen(true)}
         onOpenHolidayModal={() => setIsHolidayModalOpen(true)}
-        onOpenDownloadModal={() => setIsDownloadModalOpen(true)}
         onExportExcel={handleExportExcel}
+        onExportHtml={handleExportHtml}
         onPrint={handlePrint}
+        onSaveFile={handleSaveJson}
+        onOpenFile={handleOpenFile}
       />
 
       {/* Tabs navigation for sheets */}
@@ -463,18 +535,6 @@ export default function App() {
         isOpen={isHolidayModalOpen}
         onClose={() => setIsHolidayModalOpen(false)}
         year={activeSheet.year}
-      />
-
-      <DownloadModal
-        isOpen={isDownloadModalOpen}
-        onClose={() => setIsDownloadModalOpen(false)}
-        sheets={sheets}
-        activeSheetId={activeSheet.id}
-        onImportBackup={(importedSheets) => {
-          setSheets(importedSheets);
-          if (importedSheets[0]) setActiveSheetId(importedSheets[0].id);
-          showNotification('Pomyślnie zaimportowano arkusze z pliku kopii!', 'success');
-        }}
       />
     </div>
   );
